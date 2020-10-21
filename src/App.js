@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import CardList from "./components/CardList";
+import SearchBox from "./components/SearchBox";
+import "./App.css";
+import Scroll from "./components/Scroll";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () => {
+  const [robots, setRobots] = useState([]);
+  const [state, setState] = useState({
+    searchText: "",
+    isLoading: true,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+      const data = await response.json();
+      setRobots(data);
+    };
+    fetchData();
+  }, []);
+
+  const handleChange = (evt) => {
+    setState({ ...state, searchText: evt.target.value });
+  };
+
+  return robots.length === 0 ? (
+    <h1 className="tc">Loading</h1>
+  ) : (
+    <div className="tc">
+      <h1 className="f1">RoboFriends</h1>
+      <SearchBox searchText={state.searchText} handleChange={handleChange} />
+      <Scroll>
+        <CardList robots={robots} searchText={state.searchText} />
+      </Scroll>
     </div>
   );
-}
+};
 
 export default App;
